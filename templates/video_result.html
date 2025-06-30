@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Video Analysis Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Bebas+Neue&family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .main-flex {
+            display: flex;
+            gap: 48px;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 32px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .video-section {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 420px;
+        }
+
+        .video-section video {
+            width: 100%;
+            max-width: 700px;
+            height: auto;
+            border-radius: 18px;
+            background: #23262f;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+        }
+
+        .morse-bar {
+            margin-top: 32px;
+            font-size: 2.5rem;
+            color: #4fd1c5;
+            text-align: center;
+            font-family: 'Bebas Neue', 'Inter', Arial, sans-serif;
+            letter-spacing: 0.2em;
+        }
+
+        .timeline-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            min-width: 320px;
+            max-width: 540px;
+        }
+
+        .timeline {
+            background: #23262f;
+            border-radius: 16px;
+            padding: 24px 18px;
+            color: #fff;
+            min-height: 140px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+        }
+
+        .timeline-title {
+            font-family: 'Bebas Neue', 'Inter', Arial, sans-serif;
+            font-size: 1.5rem;
+            color: #4fd1c5;
+            margin-bottom: 12px;
+        }
+
+        .timeline-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .timeline-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-family: 'Raleway', 'Inter', Arial, sans-serif;
+            font-size: 1.1rem;
+        }
+
+        .emotion-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 2px solid #23262f;
+        }
+
+        /* Color mapping for emotions */
+        .dot-happy {
+            background: #ffe066;
+        }
+
+        .dot-sad {
+            background: #5dade2;
+        }
+
+        .dot-angry {
+            background: #e74c3c;
+        }
+
+        .dot-surprise {
+            background: #f7b731;
+        }
+
+        .dot-fear {
+            background: #8e44ad;
+        }
+
+        .dot-disgust {
+            background: #27ae60;
+        }
+
+        .dot-neutral {
+            background: #95a5a6;
+        }
+
+        .dot-other {
+            background: #7f8c8d;
+        }
+
+        .dot-unknown {
+            background: #636e72;
+        }
+
+        .dot-blink {
+            background: #4fd1c5;
+            border: 2px solid #fff;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(0deg, rgba(79,209,197,0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79,209,197,0.07) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: grid-move 8s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% {
+                background-position: 0 0, 0 0;
+            }
+
+            100% {
+                background-position: 40px 40px, 40px 40px;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .main-flex {
+                flex-direction: column;
+                align-items: center;
+                gap: 32px;
+            }
+
+            .video-section,
+            .timeline-container {
+                min-width: 0;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="container center-content" style="max-width: 1600px;">
+        <a href="{{ url_for('index') }}" class="btn secondary"
+            style="align-self: flex-start; margin-bottom: 24px;">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+        <h2 class="accent"
+            style="font-size:2.5rem; font-family:'Bebas Neue', 'Raleway', 'Inter', Arial, sans-serif;">
+            Video Analysis Result
+        </h2>
+        <div class="main-flex">
+            <div class="video-section">
+                <video controls src="{{ video_url }}"></video>
+                <div class="morse-bar">{{ morse_code or "No Morse code detected." }}</div>
+            </div>
+            <div class="timeline-container">
+                <div class="timeline">
+                    <div class="timeline-title">Emotion Timeline</div>
+                    <ul class="timeline-list">
+                        {% for entry in emotions %}
+                        {% if entry.emotion != 'blink' %}
+                        <li>
+                            {% set emo = entry.emotion|lower %}
+                            <span class="emotion-dot dot-{{ 
+                                'happy' if emo in ['happy', 'happiness'] else
+                                'sad' if emo in ['sad', 'sadness'] else
+                                'angry' if emo in ['angry', 'anger'] else
+                                'surprise' if emo in ['surprise'] else
+                                'fear' if emo in ['fear'] else
+                                'disgust' if emo in ['disgust'] else
+                                'neutral' if emo in ['neutral'] else
+                                'other' if emo in ['other'] else
+                                'unknown'
+                            }}"></span>
+                            <span class="accent">{{ entry.time }}s:</span> {{ entry.emotion }}
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-title">Blink Timeline</div>
+                    <ul class="timeline-list">
+                        {% for entry in emotions %}
+                        {% if entry.emotion == 'blink' %}
+                        <li>
+                            <span class="emotion-dot dot-blink"></span>
+                            <span class="accent">{{ entry.time }}s:</span> Blink
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:32px;">
+            <a href="{{ url_for('analyze_video') }}" class="btn secondary">Analyze Another Video</a>
+            <a href="{{ url_for('index') }}" class="btn secondary">Back to Home</a>
+        </div>
+    </div>
+</body>
+
+</html>

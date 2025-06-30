@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Video</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='grid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='containers.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body style="font-family: 'Raleway', Arial, sans-serif;">
+    <div class="grid-bg"></div>
+    <div class="container center-content">
+        <h2 class="accent">Upload Video for Analysis</h2>
+        <form method="post" enctype="multipart/form-data" class="card">
+            <input type="file" name="video" accept="video/*" required class="input-file">
+            <button type="submit" class="btn">Analyze</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn secondary">Back to Home</a>
+    </div>
+</body>
+</html>

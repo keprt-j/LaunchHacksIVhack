@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Interrogator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='grid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='containers.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="grid-bg"></div>
+        <header class="hero-header" style="font-family: 'Raleway', Arial, sans-serif;">
+            <h1 class="hero-title">
+                <span class="title-ai">Subliminality</span>
+            </h1>
+            <p class="hero-subtitle">To search for the unknown in what is known.</p>
+        </header>
+        <div class="tabs-container">
+            <div class="tab-navigation">
+                <button class="tab-btn active" data-tab="emotion">
+                    <span>Live Analysis</span>
+                </button>
+                <button class="tab-btn" data-tab="violation">
+                    <span>Video Analysis</span>
+                </button>
+            </div>
+            <div class="tab-content">
+                <div class="tab-panel active" id="emotion-panel">
+                    <div class="feature-card">
+                        <h3>Live Interrogation Analysis</h3>
+                        <p>Real-time facial emotion recognition.</p>
+                        <button class="launch-btn" onclick="window.location.href='/live'">
+                            <span>Launch Emotion Recognition</span>
+                        </button>
+                        <a href="/" class="btn secondary" style="margin-top:16px;">Back to Home</a>
+                    </div>
+                </div>
+                <div class="tab-panel" id="violation-panel">
+                    <div class="feature-card">
+                        <h3>Video Analysis System</h3>
+                        <p>Video analysis system to detect behavioral and optical patterns over time.</p>
+                        <div class="feature-stats">
+                        </div>
+                        <button class="launch-btn" onclick="window.location.href='/analyze_video'">
+                            <span>Launch Video Analysis</span>
+                        </button>
+                        <a href="/" class="btn secondary" style="margin-top:16px;">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="hero-footer">
+            <p>Powered by DeepFace & Advanced Computer Vision</p>
+        </footer>
+    </div>
+    <script>
+    // Minimal tab switching logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabPanels.forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                const tab = btn.getAttribute('data-tab');
+                document.getElementById(tab + '-panel').classList.add('active');
+            });
+        });
+    });
+    </script>
+</body>
+</html>

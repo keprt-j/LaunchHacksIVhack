@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot Assistant</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='chatbot.css') }}">
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <div class="chatbot-card">
+        <div class="chatbot-header">
+            <span>Chatbot Assistant</span>
+        </div>
+        <div id="messages">
+            <div class="message assistant">Hi! How can I help you analyze your video?</div>
+        </div>
+        <form class="chatbot-input-area" id="chatbot-form" autocomplete="off">
+            <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Type your message..." required />
+            <button type="submit" class="chatbot-send-btn">Send</button>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='interactive-cursor.js') }}"></script>
+    <script>
+        const form = document.getElementById('chatbot-form');
+        const input = document.getElementById('chatbot-input');
+        const messages = document.getElementById('messages');
+
+        function appendMessage(text, sender) {
+            const msg = document.createElement('div');
+            msg.className = 'message ' + sender;
+            msg.textContent = text;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+            return msg;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMsg = input.value.trim();
+            if (!userMsg) return;
+            appendMessage(userMsg, 'user');
+            input.value = '';
+            appendMessage('...', 'assistant');
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userMsg })
+                });
+                const data = await res.json();
+                // Remove the loading message
+                const loading = messages.querySelector('.message.assistant:last-child');
+                if (loading && loading.textContent === '...') loading.remove();
+                appendMessage(data.response, 'assistant');
+            } catch (err) {
+                const loading = messages.querySelector('.message.assistant:last-child');
+                if (loading && loading.textContent === '...') loading.remove();
+                appendMessage('Sorry, there was an error. Please try again.', 'assistant');
+            }
+        });
+    </script>
+</body>
+</html>

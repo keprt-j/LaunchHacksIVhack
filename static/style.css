@@ -1,0 +1,313 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Bebas+Neue&display=swap');
+
+:root {
+    --bg: #181a20;
+    --card-bg: #23262f;
+    --accent: #4fd1c5;
+    --text: #f4f4f4;
+    --secondary: #a0aec0;
+    --btn-bg: #2d3748;
+    --btn-hover: #4fd1c5;
+    --radius: 18px;
+    --grid-color: rgba(79,209,197,0.07);
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.grid-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(0deg, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: grid-move 8s linear infinite;
+}
+@keyframes grid-move {
+    0% { background-position: 0 0, 0 0; }
+    100% { background-position: 40px 40px, 40px 40px; }
+}
+
+.container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 48px 16px;
+}
+
+.center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 90vh;
+}
+
+h1, h2, h3 {
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+h1.accent, h2.accent, h3.accent {
+    color: var(--accent);
+}
+
+.subtitle {
+    color: var(--secondary);
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    padding: 32px 24px;
+    margin-bottom: 32px;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn {
+    background: var(--btn-bg);
+    color: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px 36px;
+    font-size: 1.2rem;
+    font-family: 'Bebas Neue', 'Raleway', Arial, sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+    margin: 8px 0;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+
+.btn:hover, .btn:focus {
+    background: var(--btn-hover);
+    color: var(--bg);
+}
+
+.btn.secondary {
+    background: transparent;
+    color: var(--secondary);
+    border: 1.5px solid var(--secondary);
+    box-shadow: none;
+}
+
+.input-file {
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 18px;
+    width: 100%;
+}
+
+.morse {
+    font-family: 'Raleway', monospace;
+    font-size: 1.3rem;
+    color: var(--accent);
+    margin: 12px 0 0 0;
+    letter-spacing: 0.2em;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px 0;
+}
+
+li {
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.hero-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.hero-title {
+    font-family: 'Bebas Neue', 'Raleway', Arial, sans-serif;
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    animation: title-glow 2s infinite alternate;
+}
+@keyframes title-glow {
+    from { text-shadow: 0 0 8px var(--accent), 0 0 2px #fff; }
+    to { text-shadow: 0 0 24px var(--accent), 0 0 8px #fff; }
+}
+
+.title-ai {
+    color: var(--accent);
+    font-family: 'Bebas Neue', 'Raleway', Arial, sans-serif;
+}
+.title-hub {
+    color: var(--text);
+    font-family: 'Bebas Neue', 'Raleway', Arial, sans-serif;
+}
+
+.hero-subtitle {
+    color: var(--secondary);
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.tabs-container {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 48px 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.tab-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+.tab-btn {
+    background: var(--btn-bg);
+    color: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 18px 36px;
+    font-size: 1.3rem;
+    font-family: 'Bebas Neue', 'Raleway', Arial, sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.tab-btn.active, .tab-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+}
+
+.tab-content {
+    width: 100%;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.feature-card {
+    background: transparent;
+    border-radius: var(--radius);
+    padding: 32px 0;
+    text-align: center;
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+}
+
+.feature-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 18px 0;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    color: var(--secondary);
+}
+
+.launch-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px 36px;
+    font-size: 1.2rem;
+    font-family: 'Bebas Neue', 'Raleway', Arial, sans-serif;
+    font-weight: 700;
+    margin-top: 24px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.launch-btn:hover {
+    background: var(--btn-bg);
+    color: var(--accent);
+}
+
+.hero-footer {
+    text-align: center;
+    color: var(--secondary);
+    margin-top: 32px;
+    font-size: 1.2rem;
+}
+
+.container,
+.card,
+.hero-container,
+.tabs-container,
+.feature-card,
+.timeline,
+.video-section,
+.chat-container,
+.emotion-result-box {
+    background: #23262f;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    position: relative;
+    z-index: 1;
+}
+
