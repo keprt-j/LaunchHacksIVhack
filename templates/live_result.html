@@ -108,6 +108,27 @@
             color: #181a20;
             font-size: 1.1rem;
         }
+        .message {
+            color: #181a20;
+            margin-bottom: 10px;
+            word-break: break-word;
+            background: none;
+            border: none;
+            padding: 0;
+            display: block;
+            max-width: 95%;
+            font-weight: normal;
+        }
+        .message.assistant {
+            background: none;
+            border: none;
+            color: #181a20;
+            font-weight: normal;
+        }
+        .message.user {
+            background: none;
+            font-weight: normal;
+        }
 
         .chat-input-row {
             display: flex;
@@ -185,6 +206,9 @@
                     <div class="chat-input-row">
                         <input type="text" id="user-input" placeholder="Type your message...">
                         <button id="send-btn">Send</button>
+                        <button id="save-pdf-btn" title="Save Last 10s as PDF" style="margin-left:8px; background:transparent; border:none; font-size:1.5rem; cursor:pointer; padding:0 10px;">
+                            <i class="fas fa-file-alt" style="color:#b0b0b0;"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -256,7 +280,8 @@
         });
         startAnalysis();
 
-        // Chatbot logic
+        // Chatbot logic with message history for PDF
+        let chatHistory = [];
         function appendMessage(cls, text, isEmotion = false) {
             const messages = document.getElementById('messages');
             const msgDiv = document.createElement('div');
@@ -269,6 +294,8 @@
             msgDiv.textContent = text;
             messages.appendChild(msgDiv);
             messages.scrollTop = messages.scrollHeight;
+            // Add to chat history with timestamp
+            chatHistory.push({ role: cls, text: text, ts: Date.now() });
         }
 
         function sendMessage() {
@@ -292,6 +319,28 @@
             if (e.key === 'Enter') {
                 sendMessage();
             }
+        });
+
+        // Save last 10 seconds of chat as PDF
+        document.getElementById('save-pdf-btn').addEventListener('click', function() {
+            const now = Date.now();
+            const last10s = chatHistory.filter(msg => now - msg.ts <= 10000);
+            fetch('/save_live_chat_pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: last10s })
+            })
+            .then(res => res.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'live_chat.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            });
         });
     </script>
 </body>

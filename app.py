@@ -1,14 +1,20 @@
-from flask import Flask, render_template, request, jsonify, url_for, send_from_directory
+from flask import Flask, render_template, request, jsonify, url_for, send_from_directory, send_file
 from openai import OpenAI
 from deepface import DeepFace
 import cv2
+import dotenv
 import numpy as np
 import mediapipe as mp
 import os
 import requests
 from werkzeug.utils import secure_filename
+
+dotenv.load_dotenv()
 from scipy.spatial.distance import euclidean
 from chatbot.chatbot_routes import chatbot_bp
+from io import BytesIO
+from fpdf import FPDF
+import time
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
@@ -257,7 +263,43 @@ def uploaded_file(filename):
         filename, 
         as_attachment=False, 
         mimetype=mime_type,
-        conditional=True  # Enable range requests for video streaming
+        conditional=True  
+    )
+
+@app.route("/save_live_chat_pdf", methods=["POST"])
+def save_live_chat_pdf():
+    data = request.get_json()
+    pdf = FPDF()
+    messages = data.get("messages", [])
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, f"Live Chat Transcript - {timestamp}", ln=True, align="C")
+    pdf.ln(10)
+
+    for msg in messages:
+        role = msg.get("role", "user").capitalize()
+        text = msg.get("text", "")
+        ts = msg.get("ts")
+        if ts:
+            try:
+                ts_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(ts/1000))
+            except Exception:
+                ts_str = str(ts)
+        else:
+            ts_str = ""
+        pdf.multi_cell(0, 10, f"[{ts_str}] {role}: {text}")
+        pdf.ln(2)
+
+    pdf_output = BytesIO()
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    pdf_output.write(pdf_bytes)
+    pdf_output.seek(0)
+    return send_file(
+        pdf_output,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=f"live_chat_{timestamp}.pdf"
     )
 
 if __name__ == "__main__":

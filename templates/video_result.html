@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Video Analysis Result</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='grid.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='containers.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -95,7 +94,6 @@
             border: 2px solid #23262f;
         }
 
-        /* Color mapping for emotions */
         .dot-happy {
             background: #ffe066;
         }
@@ -227,27 +225,24 @@
         }
 
         .message {
-            color: #181a20;
+            color: #4fd1c5;
             margin-bottom: 10px;
             word-break: break-word;
+            background: none;
+            border: none;
+            padding: 0;
+            display: block;
+            max-width: 95%;
+            font-weight: normal;
         }
 
         .message.assistant {
-            background: #e5e7eb;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #181a20;
-            display: inline-block;
-            margin-bottom: 10px;
-            max-width: 95%;
-        }
-
-        .message.user {
             background: none;
-            font-weight: bold;
+            border: bold;
+            color: #4fd1c5;
+            font-weight: normal;
         }
 
-        /* Replace cyan (#4fd1c5) with gray (#888) in chatbot only */
         .chat-messages .accent,
         .chat-messages .message.assistant .accent,
         .chat-messages .message .accent {
@@ -275,16 +270,13 @@
                     <h2 style="color: #4fd1c5; font-family:'Bebas Neue', 'Raleway', Arial, sans-serif; font-size: 1.5rem; margin-bottom: 16px;">
                         Morse Code Chatbot
                     </h2>
-                    <div id="morse-messages" class="chat-messages">
-                        {% if morse_chatbot_response %}
-                            <div class="message assistant" style="color:#4fd1c5; font-weight:bold; margin-bottom:8px;">
-                                {{ morse_chatbot_response|safe }}
-                            </div>
-                        {% endif %}
-                    </div>
+                    <div id="morse-messages" class="chat-messages"></div>
                     <div class="chat-input-row">
                         <input type="text" id="morse-user-input" placeholder="Ask about the Morse code...">
                         <button id="morse-send-btn">Send</button>
+                        <button id="morse-save-pdf-btn" title="Save Last 10s as PDF" style="margin-left:8px; background:transparent; border:none; font-size:1.5rem; cursor:pointer; padding:0 10px;">
+                            <i class="fas fa-file-alt" style="color:#b0b0b0;"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -334,19 +326,28 @@
         </div>
     </div>
     <script>
-        // Morse code chatbot logic
+        // Morse code chatbot logic with PDF save
+        let morseChatHistory = [];
+        {% if morse_chatbot_response %}
+        // Add initial assistant message from server
+        morseChatHistory.push({
+            role: "assistant",
+            text: {{ morse_chatbot_response|tojson }},
+            ts: Date.now()
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            appendMorseMessage('assistant', {{ morse_chatbot_response|tojson }});
+        });
+        {% endif %}
+
         function appendMorseMessage(cls, text) {
             const messages = document.getElementById('morse-messages');
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ' + cls;
-            if (cls === 'assistant') {
-                msgDiv.style.color = '#4fd1c5';
-                msgDiv.style.fontWeight = 'bold';
-                msgDiv.style.marginBottom = '8px';
-            }
             msgDiv.textContent = text;
             messages.appendChild(msgDiv);
             messages.scrollTop = messages.scrollHeight;
+            morseChatHistory.push({ role: cls, text: text, ts: Date.now() });
         }
 
         function sendMorseMessage() {
@@ -370,6 +371,28 @@
             if (e.key === 'Enter') {
                 sendMorseMessage();
             }
+        });
+
+        // Save last 10 seconds of chat as PDF
+        document.getElementById('morse-save-pdf-btn').addEventListener('click', function() {
+            const now = Date.now();
+            const last10s = morseChatHistory.filter(msg => now - msg.ts <= 10000);
+            fetch('/save_live_chat_pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: last10s })
+            })
+            .then(res => res.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'morse_chat.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            });
         });
     </script>
 </body>
