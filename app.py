@@ -55,7 +55,7 @@ def detect_emotion():
     prompt = (
         f"Subject is feeling {emotion}. "
         f"Here are the emotion probabilities: {emotions}. "
-        "Explain in 2-3 sentences why the subject might be feeling this way, in context of an interrogation scene. Stick to facts, not stories or a dramatization."
+        "Explain in 1-2 brief sentences, less than 15 words each, why the subject might be feeling this way, in context of an interrogation scene. Stick to facts, not stories or a dramatization."
     )
 
     chatbot_url = request.url_root.rstrip('/') + '/api/chat'
@@ -188,11 +188,12 @@ def analyze_video():
 
         print(f"Processed video created: {processed_filepath}, size: {os.path.getsize(processed_filepath)} bytes")
 
-
         morse_code = ""
+        morse_intervals = []
         if blink_times:
             # Calculate intervals between blinks
             intervals = [blink_times[i+1] - blink_times[i] for i in range(len(blink_times)-1)]
+            morse_intervals = intervals  # Save for chatbot
             for interval in intervals:
                 if interval <= 0.25:
                     morse_code += "."
@@ -202,12 +203,31 @@ def analyze_video():
                     morse_code += " "
         print(f"Morse code from blinks: {morse_code}")
 
+        morse_chatbot_response = ""
+        if morse_intervals:
+            chatbot_url = request.url_root.rstrip('/') + '/api/chat'
+            try:
+                chat_prompt = (
+                    f"Given these blink intervals (in seconds): {blink_times}, calculate potential Morse code. Provide 3 possible English translations or interpretations, explaining any ambiguity. Translation is done for prisoners of war, so make as many assumptions as necessary to an answer which makes sense (such as words like TORTURE or SOS). Be brief, limit of 20 words/explanation of a translation."
+                )
+                chat_response = requests.post(
+                    chatbot_url,
+                    json={"message": chat_prompt},
+                )
+                if chat_response.ok:
+                    morse_chatbot_response = chat_response.json().get("response", "")
+                else:
+                    morse_chatbot_response = f"Chatbot error: {chat_response.text}"
+            except Exception as e:
+                morse_chatbot_response = f"Error: {e}"
+
         return render_template(
             "video_result.html",
             video_url=url_for('uploaded_file', filename=processed_filename),
             emotions=emotions_timeline,
             filename=filename,
-            morse_code=morse_code
+            morse_code=morse_code,
+            morse_chatbot_response=morse_chatbot_response
         )
     return render_template("video_upload.html")
 

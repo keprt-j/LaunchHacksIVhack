@@ -13,8 +13,8 @@
 <body>
     <div class="grid-bg"></div>
         <header class="hero-header" style="font-family: 'Raleway', Arial, sans-serif;">
-            <h1 class="hero-title">
-                <span class="title-ai">Subliminality</span>
+            <h1 class="title">
+                <span class="title">Subliminality</span>
             </h1>
             <p class="hero-subtitle">To search for the unknown in what is known.</p>
         </header>
@@ -35,7 +35,6 @@
                         <button class="launch-btn" onclick="window.location.href='/live'">
                             <span>Launch Emotion Recognition</span>
                         </button>
-                        <a href="/" class="btn secondary" style="margin-top:16px;">Back to Home</a>
                     </div>
                 </div>
                 <div class="tab-panel" id="violation-panel">
@@ -52,12 +51,8 @@
                 </div>
             </div>
         </div>
-        <footer class="hero-footer">
-            <p>Powered by DeepFace & Advanced Computer Vision</p>
-        </footer>
     </div>
     <script>
-    // Minimal tab switching logic
     document.addEventListener('DOMContentLoaded', function() {
         const tabBtns = document.querySelectorAll('.tab-btn');
         const tabPanels = document.querySelectorAll('.tab-panel');

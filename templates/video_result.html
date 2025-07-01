@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <title>Video Analysis Result</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Bebas+Neue&family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='grid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='containers.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .main-flex {
@@ -173,6 +175,84 @@
                 max-width: 100%;
             }
         }
+
+        .chat-container {
+            background: #040506;
+            border-radius: 16px;
+            padding: 40px 32px;
+            width: 100%;
+            min-width: 420px;
+            max-width: 600px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+            margin-top: 32px;
+        }
+
+        .chat-messages {
+            background: #6e6969;
+            border-radius: 8px;
+            height: 220px;
+            overflow-y: auto;
+            padding: 16px;
+            margin-bottom: 16px;
+            color: #181a20;
+            font-size: 1.1rem;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #4fd1c5;
+            background: #181a20;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .chat-input-row button {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            background: #4fd1c5;
+            color: #181a20;
+            font-family: 'Bebas Neue', 'Raleway', Arial, sans-serif;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .message {
+            color: #181a20;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .message.assistant {
+            background: #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 18px;
+            color: #181a20;
+            display: inline-block;
+            margin-bottom: 10px;
+            max-width: 95%;
+        }
+
+        .message.user {
+            background: none;
+            font-weight: bold;
+        }
+
+        /* Replace cyan (#4fd1c5) with gray (#888) in chatbot only */
+        .chat-messages .accent,
+        .chat-messages .message.assistant .accent,
+        .chat-messages .message .accent {
+            color: #888 !important;
+        }
     </style>
 </head>
 
@@ -191,6 +271,22 @@
             <div class="video-section">
                 <video controls src="{{ video_url }}"></video>
                 <div class="morse-bar">{{ morse_code or "No Morse code detected." }}</div>
+                <div class="chat-container">
+                    <h2 style="color: #4fd1c5; font-family:'Bebas Neue', 'Raleway', Arial, sans-serif; font-size: 1.5rem; margin-bottom: 16px;">
+                        Morse Code Chatbot
+                    </h2>
+                    <div id="morse-messages" class="chat-messages">
+                        {% if morse_chatbot_response %}
+                            <div class="message assistant" style="color:#4fd1c5; font-weight:bold; margin-bottom:8px;">
+                                {{ morse_chatbot_response|safe }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="chat-input-row">
+                        <input type="text" id="morse-user-input" placeholder="Ask about the Morse code...">
+                        <button id="morse-send-btn">Send</button>
+                    </div>
+                </div>
             </div>
             <div class="timeline-container">
                 <div class="timeline">
@@ -237,6 +333,44 @@
             <a href="{{ url_for('index') }}" class="btn secondary">Back to Home</a>
         </div>
     </div>
-</body>
+    <script>
+        // Morse code chatbot logic
+        function appendMorseMessage(cls, text) {
+            const messages = document.getElementById('morse-messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + cls;
+            if (cls === 'assistant') {
+                msgDiv.style.color = '#4fd1c5';
+                msgDiv.style.fontWeight = 'bold';
+                msgDiv.style.marginBottom = '8px';
+            }
+            msgDiv.textContent = text;
+            messages.appendChild(msgDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
 
+        function sendMorseMessage() {
+            const input = document.getElementById('morse-user-input');
+            const text = input.value.trim();
+            if (!text) return;
+            appendMorseMessage('user', text);
+            input.value = '';
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            })
+                .then(res => res.json())
+                .then(data => appendMorseMessage('assistant', data.response))
+                .catch(err => appendMorseMessage('assistant', 'Error: ' + err));
+        }
+
+        document.getElementById('morse-send-btn').addEventListener('click', sendMorseMessage);
+        document.getElementById('morse-user-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendMorseMessage();
+            }
+        });
+    </script>
+</body>
 </html>

@@ -1,14 +1,30 @@
 body, html {
     font-family: 'Raleway', Arial, sans-serif !important;
 }
-.container, .card, .chat-container, .emotion-result-box, .hero-container, .tabs-container, .feature-card, .timeline, .video-section {
+.container,
+.card,
+.hero-container,
+.tabs-container,
+.feature-card,
+.timeline,
+.video-section,
+.chat-container,
+.emotion-result-box {
     background: #23262f;
     border-radius: 18px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    position: relative;
+    z-index: 1;
 }
 .container {
     padding: 48px 16px;
 }
-.card, .chat-container, .emotion-result-box, .tabs-container, .feature-card, .timeline, .video-section {
+.card,
+.chat-container,
+.emotion-result-box,
+.tabs-container,
+.feature-card,
+.timeline,
+.video-section {
     padding: 32px 24px;
 }
